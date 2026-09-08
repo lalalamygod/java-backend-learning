@@ -1,0 +1,51 @@
+name: Java CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: 安装 JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 编译测试有改动的模块
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
+          MODULES=$(echo "$CHANGED" | grep -oP '^[^/]+' | sort -u)
+          if [ -z "$MODULES" ]; then
+            echo "没有检测到模块改动，跳过"
+            exit 0
+          fi
+          for module in $MODULES; do
+            if [ -f "$module/pom.xml" ]; then
+              echo "=== 编译模块: $module ==="
+              cd $module
+              mvn clean test -q
+              if [ $? -ne 0 ]; then
+                echo "❌ $module 失败"
+                exit 1
+              fi
+              echo "✅ $module 通过"
+              cd ..
+            fi
+          done
+
+      - name: 上传测试报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: '**/target/surefire-reports/'
