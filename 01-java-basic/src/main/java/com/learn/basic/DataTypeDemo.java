@@ -65,11 +65,11 @@ public class DataTypeDemo {
         System.out.println("int + double = " + result2);
 
         // ⚠️ 陷阱：byte + byte → int，不是 byte！
-        byte b1 = 10;
-        byte b2 = 20;
-        // byte b3 = b1 + b2; // 编译错误！结果是 int
-        int b3 = b1 + b2;
-        System.out.println("byte + byte = int: " + b3);
+        byte byteb1 = 10;
+        byte byteb2 = 20;
+        // byte byteb3 = byteb1 + byteb2; // 编译错误！结果是 int
+        int byteb3 = byteb1 + byteb2;
+        System.out.println("byte + byte = int: " + byteb3);
 
         // ==================== 6. 装箱与拆箱 ====================
         // 装箱：基本类型 → 包装类型（自动）
